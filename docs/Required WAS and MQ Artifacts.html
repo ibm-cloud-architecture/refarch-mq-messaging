@@ -1,0 +1,353 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<meta name=Generator content="Microsoft Word 15 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:"Calibri Light";
+	panose-1:2 15 3 2 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:8.0pt;
+	margin-left:0in;
+	line-height:107%;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+h1
+	{mso-style-link:"Heading 1 Char";
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	line-height:107%;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:"Calibri Light",sans-serif;}
+h2
+	{mso-style-link:"Heading 2 Char";
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	line-height:107%;
+	page-break-after:avoid;
+	font-size:14.0pt;
+	font-family:"Calibri Light",sans-serif;
+	font-style:italic;}
+p.MsoHeader, li.MsoHeader, div.MsoHeader
+	{mso-style-link:"Header Char";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:8.0pt;
+	margin-left:0in;
+	line-height:107%;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{mso-style-link:"Footer Char";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:8.0pt;
+	margin-left:0in;
+	line-height:107%;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+p.MsoTitle, li.MsoTitle, div.MsoTitle
+	{mso-style-link:"Title Char";
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-align:center;
+	line-height:107%;
+	font-size:16.0pt;
+	font-family:"Calibri Light",sans-serif;
+	font-weight:bold;}
+span.Heading1Char
+	{mso-style-name:"Heading 1 Char";
+	mso-style-link:"Heading 1";
+	font-family:"Calibri Light",sans-serif;
+	font-weight:bold;}
+span.Heading2Char
+	{mso-style-name:"Heading 2 Char";
+	mso-style-link:"Heading 2";
+	font-family:"Calibri Light",sans-serif;
+	font-weight:bold;
+	font-style:italic;}
+span.TitleChar
+	{mso-style-name:"Title Char";
+	mso-style-link:Title;
+	font-family:"Calibri Light",sans-serif;
+	font-weight:bold;}
+span.HeaderChar
+	{mso-style-name:"Header Char";
+	mso-style-link:Header;}
+span.FooterChar
+	{mso-style-name:"Footer Char";
+	mso-style-link:Footer;}
+.MsoChpDefault
+	{font-family:"Calibri",sans-serif;}
+ /* Page Definitions */
+ @page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US>
+
+<div class=WordSection1>
+
+<p class=MsoTitle>BrownEAR Setup Notes</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h1>Introduction</h1>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>This document describes the various artifacts that are
+required to run the BrownEAR application.</p>
+
+<p class=MsoNormal>BrownEAR is a JEE application that contains one MDB (message
+driven bean) EJB that reads a message from a request queue and then writes the
+same message (with “Hello” as a prefix) to a response queue.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h1>MQ Artifacts</h1>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Queue Manager</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>This is a standard QM definition.</p>
+
+<p class=MsoNormal><img width=379 height=403
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image001.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Queues</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>There are two queues required, a request queue and a
+response queue.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=69
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image002.png"></p>
+
+<p class=MsoNormal>One server connection channel (CLOUD.APP.SVRCONN) was
+defined for the MDB to exclusively use to connect to the queue manager.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=59
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image003.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>For the CLOUD.APP.SVRCONN channel, the MCA user ID was set
+to admin. This means that the MDB application will be connected to the Queue
+Manager as “admin” which is a user ID defined on the operating system where the
+Queue Manager is running.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=153
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image004.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Channel Authentication Record</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>One channel authentication record was added to the
+CLOUD.APP.SVRCONN to not block users.</p>
+
+<p class=MsoNormal><img width=468 height=287
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image005.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Listener</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>One listener was defined with port 1415 for the MDB
+application to connect into.</p>
+
+<p class=MsoNormal><img width=468 height=95
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image006.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Runmqsc Commands</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>These commands were issued with the “runmqsc” CLI to allow clients
+to connect.</p>
+
+<p class=MsoNormal>SET CHLAUTH(CLOUD.APP.SVRCONN) TYPE(BLOCKUSER)
+USERLIST('nobody')</p>
+
+<p class=MsoNormal>ALTER AUTHINFO(SYSTEM.DEFAULT.AUTHINFO.IDPWOS)
+AUTHTYPE(IDPWOS) CHCKCLNT(OPTIONAL)</p>
+
+<p class=MsoNormal>REFRESH SECURITY TYPE(CONNAUTH)</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h1>WAS Artifacts</h1>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Queue Connection Factory</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=314
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image007.png"></p>
+
+<p class=MsoNormal><img width=468 height=316
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image008.png"></p>
+
+<p class=MsoNormal><img width=468 height=274
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image009.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Queues</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=341
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image010.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=342
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image011.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Activation Specification</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=291
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image012.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=282
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image013.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=308
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image014.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h2>Authentication Alias</h2>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=434 height=222
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image015.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<h1>EAR Deployment</h1>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>When you deploy the EAR, make sure the activation
+specification parameters are correct and match your artifact names.</p>
+
+<p class=MsoNormal><img width=468 height=128
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image016.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><img width=468 height=282 id="Picture 1"
+src="Required%20WAS%20and%20MQ%20Artifacts.fld/image017.png"></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+</div>
+
+</body>
+
+</html>
