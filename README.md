@@ -16,20 +16,81 @@ The event producer is a Java application using the MQ APIs to connect to a queue
 * [Consumer Code as MDB](#consumer)
 
 ## Environments
-We have two environments:
+We have two environments: on-premise and IBM Cloud.
+
 ### On premise MQ server
 
 ![](docs/SaaS-start.png)
 
 #### Configuration Queue manager
+Start MQ Explorer from your server installation
+![](docs/artifacts/mq-explorer.png)
 
+Under the Queue Managers folder look at the standard QM definition.
 ![](docs/artifacts/image001.png)
-
+#### Queues
+This is a standard QM definition.
 ![](docs/artifacts/image002.png)
+
+Under `Channels`, one server connection channel (CLOUD.APP.SVRCONN) was defined for the MDB to exclusively use to connect to the queue manager.
 
 ![](docs/artifacts/image003.png)
 
+For the CLOUD.APP.SVRCONN channel, the MCA user ID was set
+to `admin`. This means that the MDB application will be connected to the Queue Manager as “admin” which is a user ID defined on the operating system where the Queue Manager is running.
+
 ![](docs/artifacts/image004.png)
+
+#### Channel Authentication Record
+One channel authentication record was added to the CLOUD.APP.SVRCONN to not block users.
+
+![](docs/artifacts/image005.png)
+
+#### Listener
+One listener was defined with port 1415 for the MDB application to connect into
+
+![](docs/artifacts/image006.png)
+
+#### Runmqsc Commands
+These commands were issued with the “runmqsc” CLI to allow clients
+to connect.
+
+```
+SET CHLAUTH(CLOUD.APP.SVRCONN) TYPE(BLOCKUSER) USERLIST('nobody')`
+
+ALTER AUTHINFO(SYSTEM.DEFAULT.AUTHINFO.IDPWOS) AUTHTYPE(IDPWOS) CHCKCLNT(OPTIONAL)
+
+REFRESH SECURITY TYPE(CONNAUTH)
+```
+
+### Configuring WebSphere Application Server to access MQ
+As the MDB will be deployed as EJB on WebSphere Application Server, we need to do some configuration:
+
+#### Define Queue Connection Factory
+
+![](docs/artifacts/image007.png)
+
+![](docs/artifacts/image008.png)
+
+![](docs/artifacts/image009.png)
+
+#### Defining Queues
+
+![](docs/artifacts/image010.png)
+
+![](docs/artifacts/image011.png)
+
+#### Defining activation specification
+
+![](docs/artifacts/image012.png)
+
+![](docs/artifacts/image013.png)
+
+![](docs/artifacts/image014.png)
+
+#### Authentication Alias
+
+![](docs/artifacts/image015.png)
 
 ### IBM Cloud deployment
 
@@ -83,3 +144,10 @@ The producer's goal is to create "new item" events and send them to the queue. T
 BrownEAR is a JEE application that contains one MDB (message
 driven bean) EJB that reads a message from a request queue and then writes the
 same message (with “Hello” as a prefix) to a response queue.
+
+### EAR deployment
+When you deploy the EAR, make sure the activation specification parameters are correct and match your artifact names.
+
+![](docs/artifacts/image016.png)
+
+![](docs/artifacts/image017.png)
