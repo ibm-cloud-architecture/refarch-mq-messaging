@@ -112,7 +112,7 @@ Once the service is created it can be seen under the Services list of your dashb
 
 ![](docs/mq-service.png)
 
-##### Create a MQ manager
+##### Create a MQ Queue Manager
 When you opening the service you can create a queue manager by clicking on the `create` button:
 
 ![](docs/mq-serv-home.png)
@@ -125,9 +125,33 @@ The queue manager is deploying, it can take some seconds...
 
 ![](docs/qmgr-deploying.png)
 
-Then it is up and running so we need to get the connection information by downloading a json document using the `Connection information` button:
+Then it is up and running so we need to get the connection information by downloading a JSON document using the `Connection information` button.
+Save the connection information file for a later step.
 
-![](docs/qmrg-running.png)
+Next, let's setup a user account and an application account.
+If you click the "back' arrow, you will see the list of Queue Managers. In this case it's only the one you created.
+
+![](docs/qmgr-list.png)
+![](docs/qmgr-define-admin-user.png)
+![](docs/qmgr-define-admin-user-details.png)
+![](docs/qmgr-define-admin-user-results.png)
+![](docs/qmgr-define-application.png)
+![](docs/qmgr-define-application-details.png)
+![](docs/qmgr-define-application-details-Generate-MQ-Username.png)
+![](docs/qmgr-define-application-details-Add-Application.png)
+![](docs/qmgr-define-application-details-Download-API-key.png)
+![](docs/qmgr-define-application-results.png)
+![](docs/qmgr-define-admin-user-get-API-key-goto-QM-page.png)
+![](docs/qmgr-define-admin-user-get-API-key-goto-QM-details-page.png)
+![](docs/qmgr-define-admin-user-get-API-key-goto-QM-details-page-Adminstrators.png)
+![](docs/qmgr-define-admin-user-get-API-key-goto-QM-details-page-Adminstrators-Download-API-Key.png)
+![](docs/qmgr-define-admin-user-get-API-key-goto-QM-details-page-Adminstrators-Download-Connection-Info.png)
+![](docs/qmgr-define-admin-user-get-API-key-goto-QM-details-page-Adminstrators-Change-Download-API-Key.png)
+![](docs/qmgr-login-MQ-Console.png)
+![](docs/qmgr-login-MQ-Console-Create-Queue-REQ.BROWN.png)
+![](docs/qmgr-login-MQ-Console-Create-Queue-RESP.BROWN.png)
+
+![](docs/qmgr-running.png)
 
 ##### Get API key
 To connect an application to a queue manager, it must have been granted permissions to access queue managers within your IBM MQ service instance. The application must connect to the queue manager using its MQ username and the password must be the application's API key.
