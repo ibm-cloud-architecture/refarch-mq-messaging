@@ -419,9 +419,6 @@ Review your selections and click "Finish".
 
 ![](docs/548-Deploy-EAR.png)
 ![](docs/551-Deploy-EAR.png)
-
-Make sure the EAR deploys and then Save your configuration.
-
 ![](docs/554-Deploy-EAR.png)
 
 NOTE: When connecting to the queue manager, the WebSphere application must pass its username and password (API key) to the cloud based queue manager. There is an issue with the fact that the length of the API key is too long. To address this, you have to use the MQCSP authentication mode.
