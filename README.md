@@ -402,6 +402,7 @@ Make sure your response queue parameter matches the resource you created. Click 
 Make sure your connection queue factory parameter matches the resource you created. Click "Next".
 
 ![](docs/536-Deploy-EAR.png)
+![](docs/537-Deploy-EAR.png)
 
 Click "Continue".
 
@@ -424,7 +425,54 @@ Make sure the EAR deploys and then Save your configuration.
 
 ![](docs/554-Deploy-EAR.png)
 
-NOTE: When connecting to the queue manager, the WebSphere application must pass its username and password (API key) to the cloud based queue manager. There is an issue with the fact that the length of the API key is too long. To address this, you have to use the MQCSP authentication mode.
+After you deploy the EAR, you have another step to do. You have to set your Authentication Alias on the application's connection factory.
+
+In the WAS Admin Console, navigate to Applications->All applications and click on your application. Once your application details page (not shown) opens, click on the "Resource references" link (lower left).
+
+Select the EJB, and click on the "Modify Resource Authentication Method" button. Now you will see this dialog.
+
+![](docs/600-Set-Auth-Alias-Connection-Factory.png)
+
+Check the "user default method" radio button and use the pull-down list to select your authentication alias. Lastly, click the "Apply" button.
+
+![](docs/610-Set-Auth-Alias-Connection-Factory.png)
+
+The "Authentication data entry" should be set to your authentication alias (and not "None"). Lastly, click on the "OK" button (not shown here).
+
+![](docs/620-Set-Auth-Alias-Connection-Factory.png)
+
+On this page, accept the warning and click the "Continue" button.
+
+![](docs/620-Set-Auth-Alias-Connection-Factory.png)
+
+##### Final Configuration Steps
+
+First, you need to add this JVM command line parameter:
+
+-Dcom.ibm.mq.cfg.jmqi.useMQCSPauthentication=true
+
+Navigate to "All servers" and click on your server. 
+Then, expand "Java and Process Management" and click on "Process definition". Then, click on the "Java Virtual Machine" link.
+Finally, add the JVM command line parameter to the text box labeled "Generic JVM arguments".
+
+![](docs/700-Add-JVM-Param.png)
+
+NOTE #1: Queue Permissions
+
+The cloud-based queue manager will create default queues (DEV.QUEUE.1, DEV.QUEUE.2, DEV.QUEUE.3). They will have the correct permissions for the application user names and passwords that you configure. If you use them, you don't have to do anything more.
+
+But, if you create your own queues, you have to modify the permissions for your queues. The following link (see line 48) shows the runmqsc commands that configure the default rules to allow access to the "DEV.*" queues, so you would need to execute an equivalent command to grant permission to your own queues:
+
+https://github.com/ibm-messaging/mq-container/blob/4d4051312eb9d95a086e2ead76482d1f1616d149/incubating/mqadvanced-server-dev/10-dev.mqsc.tpl#L48
+
+NOTE #2: TLS between WAS and MQ
+
+If you want to encrypt the communication between WAS and MQ, here is a scenario that secures a WAS to MQ application using TLS. You can leverage this next link and adapt it to your environment:
+
+https://www.ibm.com/support/knowledgecenter/prodconn_1.0.0/com.ibm.scenarios.wmqwassecure.doc/topics/cfgssl_was.htm?cp=SSFKSJ_9.0.0
+
+
+NOTE #3: When connecting to the queue manager, the WebSphere application must pass its username and password (API key) to the cloud based queue manager. There is an issue with the fact that the length of the API key is too long. To address this, you have to use the MQCSP authentication mode.
 
 WAS v8.5.5 includes an old version of the MQ resource adapter (from MQ v7.1, see https://www-01.ibm.com/support/docview.wss?uid=swg21248089) which doesn't have the capability to control the compatibility mode, so we are basically sure that only a subset of the password is being sent, and so causing the problem you are seeing.
 
