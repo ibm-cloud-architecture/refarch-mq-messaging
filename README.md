@@ -443,7 +443,7 @@ The "Authentication data entry" should be set to your authentication alias (and 
 
 On this page, accept the warning and click the "Continue" button.
 
-![](docs/620-Set-Auth-Alias-Connection-Factory.png)
+![](docs/630-Set-Auth-Alias-Connection-Factory.png)
 
 ##### Final Configuration Steps
 
