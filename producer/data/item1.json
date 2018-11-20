@@ -1,0 +1,6 @@
+{ itemId : 12,
+  quantity: 10,
+  site: "Manif01",
+  supplierId: 5,
+  cost: 12
+}

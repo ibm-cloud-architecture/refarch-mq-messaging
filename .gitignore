@@ -1,1 +1,3 @@
-/target/
+producer/target/
+mdb-consumer/target/
+mdb-consumer/BrownEJB/build/

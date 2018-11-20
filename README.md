@@ -1,40 +1,52 @@
 # MQ Messaging Solution
-This project is part of the 'IBM Integration Reference Architecture' suite, available at [https://github.com/ibm-cloud-architecture/refarch-integration](https://github.com/ibm-cloud-architecture/refarch-integration).
+This project is part of the 'IBM Integration Reference Architecture' implementation solution, available at [https://github.com/ibm-cloud-architecture/refarch-integration](https://github.com/ibm-cloud-architecture/refarch-integration).
 
-Updated 10/5/2018
+Updated 11/19/2018
 
-It presents the implementation of an event producer, creating inventory update event, posted to a queue managed by IBM MQ Queue managed running on-premise or on IBM Cloud.
+It presents the implementation of an event producer, creating inventory update events, posted to a queue managed by IBM MQ Queue managed running on-premise or on IBM Cloud.
 
 The Messaging application is integrated into the [inventory management](https://github.com/ibm-cloud-architecture/refarch-integration-inventory-dal) application.
 
-The event producer is a Java application using the MQ APIs to connect to a queue manager and send message as text. The payload is a json document representing a new item added to a warehouse. The MQ manager is defined with IBM Cloud and an Event Listener, implemented as Message Driven Bean deployed on traditional WebSphere Application Server. This code will use the inventory data access layer service to persist data into the Inventory Database on DB2.
+The event producer is a Java application using the MQ APIs to connect to a queue manager and send message as text. The payload is a json document representing a new item added to a warehouse. The MQ manager is defined with IBM Cloud and an Event Listener, implemented as Message Driven Bean deployed on traditional WebSphere Application Server. This code uses the inventory data access layer service to persist data into the Inventory Database on DB2.
 
 ## Table of contents
+
 * [Environments](#environments)
 * [MQ on IBM Cloud](#configuring-mq-on-ibm-cloud-service)
 * [Producer Code](#producer)
 * [Consumer Code as MDB](#consumer)
 
 ## Environments
+
 We have two environments: on-premise and IBM Cloud.
 
 ### On premise MQ server
 
+This environment has at least three hosts, one running DB2 server, one WebSphere Application Server and one IBM MQ.
+
 ![](docs/SaaS-start.png)
 
-#### Configuration Queue manager
-Start MQ Explorer from your server installation
-![](docs/artifacts/mq-explorer.png)
+The WebSphere application server has two applications deployed: one SOAP based web service for operations on the inventory entities and one message driven bean listening to messages on queue managed by MQ.
 
-Under the Queue Managers folder look at the standard QM definition.
-![](docs/artifacts/image001.png)
+#### Configuration Queue manager
+
+Start MQ Explorer from your server installation. We used RedHat RHEL version 7.3, so MQ Expoloere is in the Developer folder.
+
+![Explorer](docs/artifacts/mq-explorer.png)
+
+Under the Queue Managers folder look at the standard QM definition: The Queue manager is named LQM1...
+
+![LQM1](docs/artifacts/image001.png)
+
 #### Queues
-This is a standard QM definition.
-![](docs/artifacts/image002.png)
+
+Under the LQM1 > Queues folder we have defined two queues: REQ.BROWN and RESP.BROWN for the request / response messagin:
+
+![Queues](docs/artifacts/image002.png)
 
 Under `Channels`, one server connection channel (CLOUD.APP.SVRCONN) was defined for the MDB to exclusively use to connect to the queue manager.
 
-![](docs/artifacts/image003.png)
+![Channel](docs/artifacts/image003.png)
 
 For the CLOUD.APP.SVRCONN channel, the MCA user ID was set
 to `admin`. This means that the MDB application will be connected to the Queue Manager as “admin” which is a user ID defined on the operating system where the Queue Manager is running.
@@ -42,16 +54,19 @@ to `admin`. This means that the MDB application will be connected to the Queue M
 ![](docs/artifacts/image004.png)
 
 #### Channel Authentication Record
-One channel authentication record was added to the CLOUD.APP.SVRCONN to not block users.
+
+One `Channel Authentication Record` was added to the CLOUD.APP.SVRCONN to do not block users.
 
 ![](docs/artifacts/image005.png)
 
 #### Listener
+
 One listener was defined with port 1415 for the MDB application to connect into
 
 ![](docs/artifacts/image006.png)
 
 #### Runmqsc Commands
+
 These commands were issued with the “runmqsc” CLI to allow clients
 to connect.
 
@@ -64,17 +79,22 @@ REFRESH SECURITY TYPE(CONNAUTH)
 ```
 
 ### Configuring WebSphere Application Server to access MQ
-As the MDB will be deployed as EJB on WebSphere Application Server, we need to do some configuration:
+
+As the MDB will be deployed as EJB on WebSphere Application Server, we need to do some configuration within WAS using the Admin Console web app:
 
 #### Define Queue Connection Factory
 
 ![](docs/artifacts/image007.png)
+
+The hostname needs to match the MQ VM hostname and the port number the one sets up in previous listener configuration, as well as the server connection channel name:
 
 ![](docs/artifacts/image008.png)
 
 ![](docs/artifacts/image009.png)
 
 #### Defining Queues
+
+We are defining two queues also in WebSphere. The most important one is the `REQ.BROWN` one as this is the one used to get message from. The `RESP.BROWN` is more for testing.
 
 ![](docs/artifacts/image010.png)
 
@@ -487,11 +507,13 @@ WAS 9.0 includes a more up to date MQ resource adapter version against which you
 The producer's goal is to create "new item" events and send them to the queue. This is to simulate a warehouse backend service with mechanical systems which can scan item when reaching a specific part of the warehouse. The event will be processed to persist data in an Inventory database.
 
 ### Consumer
+
 BrownEAR is a JEE application that contains one MDB (message
 driven bean) EJB that reads a message from a request queue and then writes the
 same message (with “Hello” as a prefix) to a response queue.
 
 ### EAR deployment
+
 When you deploy the EAR, make sure the activation specification parameters are correct and match your artifact names.
 
 ![](docs/artifacts/image016.png)
