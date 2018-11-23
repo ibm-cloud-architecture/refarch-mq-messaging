@@ -1,7 +1,7 @@
 # MQ Messaging Solution
 This project is part of the 'IBM Integration Reference Architecture' implementation solution, available at [https://github.com/ibm-cloud-architecture/refarch-integration](https://github.com/ibm-cloud-architecture/refarch-integration).
 
-Updated 11/19/2018
+Updated 11/23/2018
 
 It presents the implementation of an event producer, creating inventory update events, posted to a queue managed by IBM MQ Queue managed running on-premise or on IBM Cloud.
 
@@ -11,26 +11,38 @@ The event producer is a Java application using the MQ APIs to connect to a queue
 
 ## Table of contents
 
+* [Getting started](#getting-started)
 * [Environments](#environments)
 * [MQ on IBM Cloud](#configuring-mq-on-ibm-cloud-service)
 * [Producer Code](#producer)
 * [Consumer Code as MDB](#consumer)
 
+## Getting Started
+
+If you do know a minimum about MQ, here are a set of articles you may need to read to understand the content of this repository:
+* [MQ Essentials- Getting started with IBM MQ](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/getting-started-mq/) 
+* [First demo on docker](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/mq-connect-to-queue-manager/#docker)
+* [Cheat sheet](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/dev-cheat-sheet/)
+* [Develop a JMS point to point application](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/develop-mq-jms/) The code of this IBM tutorial is also in this repository under the `democlient/MQJMSClient` folder so we can test the configuration.
+* [Product documentation](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.0.0/com.ibm.mq.helphome.v90.doc/WelcomePagev9r0.html)
+
 ## Environments
 
-We have two environments: on-premise and IBM Cloud.
+We have two environments: on-premise and IBM Cloud. For the on-premise we propose two approaches: one with vSphere and one with docker so you can run the scenario on your laptop. See the [following note](docker/README.md) to configure the image with the needed queues and channels used in the lift and shift scenario. This docker approach is used to run mq locally on you laptop.
 
-### On premise MQ server
-
-This environment has at least three hosts, one running DB2 server, one WebSphere Application Server and one IBM MQ.
+The following figure illustrates the starting "on-premise" environment running the five components of the lift and shift scenario.
 
 ![](docs/SaaS-start.png)
 
 The WebSphere application server has two applications deployed: one SOAP based web service for operations on the inventory entities and one message driven bean listening to messages on queue managed by MQ.
 
+### On premise MQ server (vSphere)
+
+For on-premise server we are using a vSphere environment with at least three hosts, one running DB2 server, one WebSphere Application Server and one IBM MQ.
+
 #### Configuration Queue manager
 
-Start MQ Explorer from your server installation. We used RedHat RHEL version 7.3, so MQ Expoloere is in the Developer folder.
+Start MQ Explorer from your server installation. We used RedHat RHEL version 7.3, so MQ Explorer is in the Developer folder.
 
 ![Explorer](docs/artifacts/mq-explorer.png)
 
@@ -40,7 +52,7 @@ Under the Queue Managers folder look at the standard QM definition: The Queue ma
 
 #### Queues
 
-Under the LQM1 > Queues folder we have defined two queues: REQ.BROWN and RESP.BROWN for the request / response messagin:
+Under the LQM1 > Queues folder we have defined two queues: REQ.BROWN and RESP.BROWN for the request / response messaging:
 
 ![Queues](docs/artifacts/image002.png)
 
@@ -116,10 +128,10 @@ We are defining two queues also in WebSphere. The most important one is the `REQ
 
 ![](docs/SaaS-endState.png)
 
-
 #### Configuring MQ on IBM Cloud service
 
 ##### Create a MQ service
+
 Once logged to the IBM Cloud console, using the `create new resource` button, select in the Catalog > Integration menu the `MQ` service:
 
 ![](docs/integration-catalog.png)
@@ -133,6 +145,7 @@ Once the service is created it can be seen under the Services list of your dashb
 ![](docs/mq-service.png)
 
 ##### Create a MQ Queue Manager
+
 When you opening the service you can create a queue manager by clicking on the `create` button:
 
 ![](docs/mq-serv-home.png)
@@ -225,8 +238,6 @@ Create a response queue.
 
 ![](docs/qmgr-login-MQ-Console-Create-Queue-RESP.BROWN.png)
 
-
-
 #### Configuring EAR on WebSphere
 
 Log into the WebSphere Admin Console.
@@ -268,7 +279,6 @@ Preview your selections and click the "Finish" button.
 ![](docs/021-QCF.png)
 
 Save your configuration changes.
-
 
 ##### Create Request Queue
 
@@ -491,7 +501,6 @@ If you want to encrypt the communication between WAS and MQ, here is a scenario 
 
 https://www.ibm.com/support/knowledgecenter/prodconn_1.0.0/com.ibm.scenarios.wmqwassecure.doc/topics/cfgssl_was.htm?cp=SSFKSJ_9.0.0
 
-
 NOTE #3: When connecting to the queue manager, the WebSphere application must pass its username and password (API key) to the cloud based queue manager. There is an issue with the fact that the length of the API key is too long. To address this, you have to use the MQCSP authentication mode.
 
 WAS v8.5.5 includes an old version of the MQ resource adapter (from MQ v7.1, see https://www-01.ibm.com/support/docview.wss?uid=swg21248089) which doesn't have the capability to control the compatibility mode, so we are basically sure that only a subset of the password is being sent, and so causing the problem you are seeing.
@@ -504,6 +513,7 @@ WAS 9.0 includes a more up to date MQ resource adapter version against which you
 ## Code
 
 ### Producer
+
 The producer's goal is to create "new item" events and send them to the queue. This is to simulate a warehouse backend service with mechanical systems which can scan item when reaching a specific part of the warehouse. The event will be processed to persist data in an Inventory database.
 
 ### Consumer

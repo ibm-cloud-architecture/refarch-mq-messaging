@@ -1,3 +1,5 @@
 producer/target/
+democlient/**/*.class
 mdb-consumer/target/
 mdb-consumer/BrownEJB/build/
+/.vscode/

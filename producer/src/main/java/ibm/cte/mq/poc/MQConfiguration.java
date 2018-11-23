@@ -36,7 +36,6 @@ public class MQConfiguration {
 
 	private void loadPropertiesFromStream(InputStream input){
 		try {
-			input = getClass().getClassLoader().getResourceAsStream("config.properties");
 			properties.load(input);
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -63,10 +62,10 @@ public class MQConfiguration {
 	private  void setDefaults() {
 		properties.setProperty(MQ_PLATFORM,"IBM MQ");
 		properties.setProperty(MQ_QUEUEMANAGER,"LQM1");
-		properties.setProperty(MQ_QUEUENAME,"DEV.QUEUE"); 
+		properties.setProperty(MQ_QUEUENAME,"REQ.BROWN"); 
 		properties.setProperty(MQ_HOST,"localhost");
-		properties.setProperty(MQ_PORT,"1420");
-		properties.setProperty(MQ_CHANNEL, "SYSTEM.DEF.SVRCONN");		
+		properties.setProperty(MQ_PORT,"1414");
+		properties.setProperty(MQ_CHANNEL, "CLOUD.APP.SVRCONN");		
 		properties.setProperty(MQ_USERID, "admin");
 		properties.setProperty(MQ_PASSWORD, "admin01");
 	}
