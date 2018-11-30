@@ -1,4 +1,4 @@
 from ibmcom/mq
 
 
-COPY brown-config.mqsc /etc/mqm/
+COPY brown-config.mqsc /etc/mqm/config.mqsc

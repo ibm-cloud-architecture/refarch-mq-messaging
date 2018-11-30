@@ -10,7 +10,7 @@ public class TestProducerConsumerOnPremise {
 		System.out.println(" 1- Create the consumer thread");
 		InventoryConsumer consumer = new InventoryConsumer();
 		consumer.configure("src/main/resources/config.properties");
-		// Thread t = new Thread(consumer,"Consumer");
+		//Thread t = new Thread(consumer,"Consumer");
 		// t.start();
 		
 		System.out.println(" 2- Create the producer to send one item");
@@ -20,7 +20,7 @@ public class TestProducerConsumerOnPremise {
 	
 		System.out.println("Sent this item:" + i.toString());
 		producer.run(i);
-		System.out.println(" 3- Stop the consumer thread");
+		
 		//t.interrupt();
 		consumer.run();
 	}

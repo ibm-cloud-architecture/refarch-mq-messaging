@@ -31,7 +31,7 @@ public class InventoryConsumer implements Runnable {
 	         int openOptions = MQConstants.MQOO_OUTPUT | MQConstants.MQOO_INPUT_AS_Q_DEF;
 
 	         // creating destination
-	         MQQueue queue = qMgr.accessQueue("RESP.BROWN", 
+	         MQQueue queue = qMgr.accessQueue(getConfig().getProperties().getProperty(MQConfiguration.MQ_QUEUENAME, "REQ.BROWN"), 
 	            		openOptions);
 	        	 queue.get(retrievedMessage,gmo);
 	        	 String msgText = retrievedMessage.readUTF();
