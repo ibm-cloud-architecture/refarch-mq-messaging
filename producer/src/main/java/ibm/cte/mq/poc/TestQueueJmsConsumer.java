@@ -1,21 +1,18 @@
 package ibm.cte.mq.poc;
 
 import javax.jms.Destination;
+import javax.jms.JMSConsumer;
 import javax.jms.JMSContext;
-import javax.jms.JMSException;
-import javax.jms.JMSProducer;
-import javax.jms.TextMessage;
 
-import com.google.gson.Gson;
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
-public class TestQueueJmsProducer {
+public class TestQueueJmsConsumer {
 	private static int status = 1;
 	private static JMSContext context = null;
 	private static Destination destination = null;
-	private static JMSProducer producer = null;
+	private static JMSConsumer consumer = null;
 	
     public static void main(String[] args) {
     	MQConfiguration cfg = new MQConfiguration();
@@ -37,60 +34,12 @@ public class TestQueueJmsProducer {
 			// Create JMS objects
 			context = cf.createContext();
 			destination = context.createQueue("queue:///" + cfg.getProperties().getProperty(MQConfiguration.MQ_QUEUENAME));
+			consumer = context.createConsumer(destination); // autoclosable
+			String receivedMessage = consumer.receiveBody(String.class, 15000); // in ms or 15 seconds
 
-			Inventory i = new Inventory();
-			i.setCost(10);
-			i.setItemId(12345);
-			i.setQuantity(1);
-			i.setSite("Site01");
-			i.setSupplierId(1);
-			Gson parser = new Gson();
-			TextMessage message = context.createTextMessage(parser.toJson(i));
-			producer = context.createProducer();
-			producer.send(destination, message);
-			recordSuccess();
-    	} catch (JMSException jmsex) {
-			recordFailure(jmsex);
-		}
+			System.out.println("\nReceived message:\n" + receivedMessage);
+    	} catch(Exception e) {
+    		
+    	}
     }
-    
-    /**
-	 * Record this run as successful.
-	 */
-	private static void recordSuccess() {
-		System.out.println("SUCCESS");
-		status = 0;
-		return;
-	}
-	
-    private static void recordFailure(Exception ex) {
-		if (ex != null) {
-			if (ex instanceof JMSException) {
-				processJMSException((JMSException) ex);
-			} else {
-				System.out.println(ex);
-			}
-		}
-		System.out.println("FAILURE");
-		status = -1;
-		return;
-	}
-
-	/**
-	 * Process a JMSException and any associated inner exceptions.
-	 *
-	 * @param jmsex
-	 */
-	private static void processJMSException(JMSException jmsex) {
-		System.out.println(jmsex);
-		Throwable innerException = jmsex.getLinkedException();
-		if (innerException != null) {
-			System.out.println("Inner exception(s):");
-		}
-		while (innerException != null) {
-			System.out.println(innerException);
-			innerException = innerException.getCause();
-		}
-		return;
-	}
 }
