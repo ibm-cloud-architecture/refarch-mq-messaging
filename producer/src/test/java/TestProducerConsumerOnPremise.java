@@ -1,4 +1,4 @@
-import ibm.cte.mq.poc.Inventory;
+import ibm.cte.mq.msg.Inventory;
 import ibm.cte.mq.poc.InventoryConsumer;
 import ibm.cte.mq.poc.ProduceItemMessage;
 
@@ -15,7 +15,7 @@ public class TestProducerConsumerOnPremise {
 		
 		System.out.println(" 2- Create the producer to send one item");
 		ProduceItemMessage producer = new ProduceItemMessage();
-		producer.configure(new String[] {"src/main/resources/config.properties","data/item1.json"});
+		producer.init(new String[] {"src/main/resources/config.properties","data/item1.json"});
 		Inventory i = producer.loadInventory();
 	
 		System.out.println("Sent this item:" + i.toString());

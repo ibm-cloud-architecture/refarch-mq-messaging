@@ -9,6 +9,8 @@ import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.constants.MQConstants;
 
+import ibm.cte.mq.MQConfiguration;
+
 public class InventoryConsumer implements Runnable {
 	
 	private MQConfiguration config = new MQConfiguration();

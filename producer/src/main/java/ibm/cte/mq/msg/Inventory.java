@@ -1,4 +1,4 @@
-package ibm.cte.mq.poc;
+package ibm.cte.mq.msg;
 
 /**
  * Inventory element supporting the message structure

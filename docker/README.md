@@ -7,7 +7,7 @@ Inside the container, the default MQ installation on Ubuntu has the following ob
   Channel DEV.APP.SVRCONN  
   Listener DEV.LISTENER.TCP on port 1414
 
-To match the vSphere settings we have developed a MQ config file (brown-config.mqsc) and copy it in the Dockerfile. You can build the docker file but we also publish this image (ibmcase/mq) to the dockerhub public site. So just running the image will give you the necessary container.
+To match the vSphere settings used with the lift and shift scenario, we have developed a MQ config file (brown-config.mqsc). You can build the docker file if you want to modify the configuration but we also published this image (ibmcase/brownmq) to the dockerhub public site. So just running the image will give you the necessary container. The command `build.sh` can be used to build your own image and `runmqdocker.sh` to start a localMQ.
 
 Queue manager and queue data are saved in the filesystem. To avoid losing the queue manager and queue data we use volumes. Volumes are attached to containers when they are run and persist after the container is deleted. The following command creates a volume
 
@@ -15,12 +15,12 @@ Queue manager and queue data are saved in the filesystem. To avoid losing the qu
 docker volume create qm1data
 ```
 
-The MQ clients use a Channel to communicate with the MQ manager and over the network. We need to create a network to support this communication
+The remote MQ clients use a `Channel` to communicate with the MQ manager and over the network. We need to create a network to support this communication
 ```
-docker network create mq-demo-network
+docker network create mq-brown-network
 ``` 
 
-The script `runmqdocker.sh` start MQ as daemon. We need now to connect to the server via the command: `docker exec -ti localMQ /bin/bash`. Once logged we can verify the installation and data paths by running `dspmqver`:
+The script `runmqdocker.sh` starts MQ as daemon. We need now to connect to the server via the command: `docker exec -ti localMQ /bin/bash`. Once logged we can verify the installation and data paths by running `dspmqver`:
 
 ```shell
 (mq:9.1.0.0)root@38c35b86d5a5:/# dspmqver
@@ -47,23 +47,42 @@ Display your running queue managers:
 QMNAME(LQM1)                                              STATUS(Running)
 ```
 
-### Console 
+### MQ Console 
 
-The MQ Console is accessible at https://localhost:9443/ibmmq/console/login.html with default user admin / passw0rd. Here is an example of console:
+The MQ Console is accessible at https://localhost:9443/ibmmq/console/login.html with default user admin / passw0rd. Here is an example of console layout with Queue manager (LQM1), channels (CLOUD.APP.SRVCONN) and queues (REQ.BROWN):
 
 ![](mq-console.png)
 
-### Run Item producer
+### Test Inventory JMS Consumer / Producer
 
+We propose two implementations for the item producer: a JMS one or a pure MQ Java api one. To run the JMS producer and consumer do the following steps:
 
-### Demo Client
+1. Start a terminal window (bash or shell)
+1. cd `producer` folder
+1. Start the JMS producer that is listening to message arriving on REQ.BROWN queue and parse it as an Inventory:  `./runJmsMQConsumer.sh`.
+1. In a second terminal window, under the `producer` folder, start the producer code that will parse an inventory definition defined in the `data/item1.json` and sends it to the REQ.BROWN queue. 
 
-We are reusing a Dockerfile under the `democlient` folder to validate the configuration. To run it, execute the following steps under the `democlient` folder:
+The trace on Producer side should look like:
+> #####################################
+ Produce item inventory message to MQ 
+Platform:IBM MQ on Premise
+Queue Manager:LQM1
+Queue Name:REQ.BROWN
+channel:CLOUD.APP.SVRCONN
+hostname:localhost
+port:1414
+userid:admin
+password:passw0rd
+SUCCESS
 
-```shell
-# Be sure to be logged to IBM support web site https://www.ibm.com/support/home/, so the download will work
-# Build 
-docker build -t mq-demo .
-# Run
-docker run --network mq-demo-network -ti mq-demo
-``` 
+And on the consumer side:
+> ########################################
+ Consusmer for inventory message from MQ 
+ Queue: REQ.BROWN
+ ########################################  
+  Waiting....  
+  Received message:
+{"itemId":12,"quantity":10,"site":"Manif01","supplierId":5,"cost":12.0}  
+Inventory:
+item= 12 for quantity= 10 @ Manif01 from 5
+

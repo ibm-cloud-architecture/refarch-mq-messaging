@@ -1,4 +1,4 @@
-package ibm.cte.mq.poc;
+package ibm.cte.mq;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,7 +33,7 @@ public class MQConfiguration {
 	public void loadProperties() {
 		loadPropertiesFromStream(getClass().getClassLoader().getResourceAsStream("config.properties"));
 	}
-
+	
 	private void loadPropertiesFromStream(InputStream input){
 		try {
 			properties.load(input);

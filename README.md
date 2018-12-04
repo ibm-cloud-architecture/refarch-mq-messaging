@@ -1,11 +1,11 @@
 # MQ Messaging Solution
 This project is part of the 'IBM Integration Reference Architecture' implementation solution, available at [https://github.com/ibm-cloud-architecture/refarch-integration](https://github.com/ibm-cloud-architecture/refarch-integration).
 
-Updated 11/23/2018
+Updated 12/03/2018
 
-It presents the implementation of an event producer, creating inventory update events, posted to a queue managed by IBM MQ Queue managed running on-premise or on IBM Cloud.
+It presents the implementation of an event producer, creating inventory update events, posted to a queue managed by IBM MQ Queue managed running on-premise servers or on IBM Cloud MQ service.
 
-The Messaging application is integrated into the [inventory management](https://github.com/ibm-cloud-architecture/refarch-integration-inventory-dal) application.
+The Messaging application is integrated into the [inventory management](https://github.com/ibm-cloud-architecture/refarch-integration-inventory-dal) application / business use cases.
 
 The event producer is a Java application using the MQ APIs to connect to a queue manager and send message as text. The payload is a json document representing a new item added to a warehouse. The MQ manager is defined with IBM Cloud and an Event Listener, implemented as Message Driven Bean deployed on traditional WebSphere Application Server. This code uses the inventory data access layer service to persist data into the Inventory Database on DB2.
 
@@ -13,6 +13,9 @@ The event producer is a Java application using the MQ APIs to connect to a queue
 
 * [Getting started](#getting-started)
 * [Environments](#environments)
+    * [MQ running locally with docker](docker/README.md)
+    * [MQ on premise with vSphere](#on-premise-mq-server-(vSphere))
+    * [Configuring WebSphere Application Server to access MQ](#configuring-websphere-application-server-to-access-mq)
 * [MQ on IBM Cloud](#configuring-mq-on-ibm-cloud-service)
 * [Producer Code](#producer)
 * [Consumer Code as MDB](#consumer)
@@ -22,115 +25,59 @@ The event producer is a Java application using the MQ APIs to connect to a queue
 If you do know a minimum about MQ, here are a set of articles you may need to read to understand the content of this repository:
 * [MQ Essentials- Getting started with IBM MQ](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/getting-started-mq/) 
 * [First demo on docker](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/mq-connect-to-queue-manager/#docker)
-* [Cheat sheet](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/dev-cheat-sheet/)
+* [MQ Cheat sheet](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/dev-cheat-sheet/)
 * [Develop a JMS point to point application](https://developer.ibm.com/messaging/learn-mq/mq-tutorials/develop-mq-jms/) The code of this IBM tutorial is also in this repository under the `democlient/MQJMSClient` folder so we can test the configuration.
-* [Product documentation](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.0.0/com.ibm.mq.helphome.v90.doc/WelcomePagev9r0.html)
+* [IBM MQ v9.0+ product documentation](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.0.0/com.ibm.mq.helphome.v90.doc/WelcomePagev9r0.html)
 
-## Environments
+### MQ Architecture background
 
-We have two environments: on-premise and IBM Cloud. For the on-premise we propose two approaches: one with vSphere and one with docker so you can run the scenario on your laptop. See the [following note](docker/README.md) to configure the image with the needed queues and channels used in the lift and shift scenario. This docker approach is used to run mq locally on you laptop.
+An IBM MQ queue manager provides asynchronous intercommunication between the applications requesting the service and the applications providing the service.
+
+![](docs/mq-architecture.png)
+
+* [Single Queue Manager](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.1.0/com.ibm.mq.pla.doc/q004710_.htm) Client applications can run locally to the MQ manager which manages MQ Objects like queues and channels. Applications can also access remotely the queue manager.  
+
+* [Clustering](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.1.0/com.ibm.mq.pla.doc/q004691_.htm) Applications can gain asynchronous communication with a service hosted on another queue manager on another system, and queue manager can provide access to another queue manager. Routes that connect different queue managers and their queues are defined using distributed queuing techniques. The queue managers within the architecture are connected using channels.
+
+### MQ lift and shift scenario
+
+As illustrated in the figure below, a inventory / item event producer is sending message about inventory update in a warehouse, to a MQ server configured with queues and channels. An MDB listens to message and calls a SOAP service to persist the inventory update. The approach of the lift and shift scenario is to take this MDB and MQ instance and use the IBM MQ Service on IBM Cloud and deploy a the MDB on a WebSphere application server on IBM Cloud. The steps  can be summarized as:
+
+* [Step 1- Run MQ solution locally](#1--environments) You can use docker or VM to run a MQ server locally on your computer or on a vSphere environment.
+* [Step 2- Configure MQ service on IBM Cloud](#2--configuring-mq-on-ibm-cloud-service)
+
+* [Step 3- Test with remote MQ]()
+* [Step 4- Deploy the MDB on WAS service](#configuring-mdb-resources-on-websphere-application-server)
+
+## 1- Environments
+
+We propose two environments: `on-premise` and IBM Cloud. For the on-premise we propose two approaches: one with vSphere and one with docker so you can run the scenario on your laptop. See the [following note](docker/README.md) to configure and run the MQ docker image with the needed queues and channels used in the lift and shift scenario.
 
 The following figure illustrates the starting "on-premise" environment running the five components of the lift and shift scenario.
 
 ![](docs/SaaS-start.png)
 
-The WebSphere application server has two applications deployed: one SOAP based web service for operations on the inventory entities and one message driven bean listening to messages on queue managed by MQ.
+The WebSphere application server has two applications deployed: one SOAP based web service for operations on the inventory entities and one message driven bean listening to messages on queue managed by MQ and calling the SOAP interface to persist inventory updates coming as message on the queue.
+
+### MQ docker
+
+We describe [in this note](docker/README.md) how to build and run your own image, or use our dockerhub public image (ibmcase/brownmq), built with the Queue, Channels, ... necessary for the lift and shift scenario. In this note we also describe how to run an inventory producer code and a consumer that help to test the environment and deployment.
 
 ### On premise MQ server (vSphere)
 
-For on-premise server we are using a vSphere environment with at least three hosts, one running DB2 server, one WebSphere Application Server and one IBM MQ.
+For on-premise server we are using a vSphere environment with at least three hosts, one running DB2 server, one WebSphere Application Server and one IBM MQ, we are describing this configuration [in this note](docs/mq-premise.md).
 
-#### Configuration Queue manager
+## IBM Cloud deployment
 
-Start MQ Explorer from your server installation. We used RedHat RHEL version 7.3, so MQ Explorer is in the Developer folder.
-
-![Explorer](docs/artifacts/mq-explorer.png)
-
-Under the Queue Managers folder look at the standard QM definition: The Queue manager is named LQM1...
-
-![LQM1](docs/artifacts/image001.png)
-
-#### Queues
-
-Under the LQM1 > Queues folder we have defined two queues: REQ.BROWN and RESP.BROWN for the request / response messaging:
-
-![Queues](docs/artifacts/image002.png)
-
-Under `Channels`, one server connection channel (CLOUD.APP.SVRCONN) was defined for the MDB to exclusively use to connect to the queue manager.
-
-![Channel](docs/artifacts/image003.png)
-
-For the CLOUD.APP.SVRCONN channel, the MCA user ID was set
-to `admin`. This means that the MDB application will be connected to the Queue Manager as “admin” which is a user ID defined on the operating system where the Queue Manager is running.
-
-![](docs/artifacts/image004.png)
-
-#### Channel Authentication Record
-
-One `Channel Authentication Record` was added to the CLOUD.APP.SVRCONN to do not block users.
-
-![](docs/artifacts/image005.png)
-
-#### Listener
-
-One listener was defined with port 1415 for the MDB application to connect into
-
-![](docs/artifacts/image006.png)
-
-#### Runmqsc Commands
-
-These commands were issued with the “runmqsc” CLI to allow clients
-to connect.
-
-```
-SET CHLAUTH(CLOUD.APP.SVRCONN) TYPE(BLOCKUSER) USERLIST('nobody')`
-
-ALTER AUTHINFO(SYSTEM.DEFAULT.AUTHINFO.IDPWOS) AUTHTYPE(IDPWOS) CHCKCLNT(OPTIONAL)
-
-REFRESH SECURITY TYPE(CONNAUTH)
-```
-
-### Configuring WebSphere Application Server to access MQ
-
-As the MDB will be deployed as EJB on WebSphere Application Server, we need to do some configuration within WAS using the Admin Console web app:
-
-#### Define Queue Connection Factory
-
-![](docs/artifacts/image007.png)
-
-The hostname needs to match the MQ VM hostname and the port number the one sets up in previous listener configuration, as well as the server connection channel name:
-
-![](docs/artifacts/image008.png)
-
-![](docs/artifacts/image009.png)
-
-#### Defining Queues
-
-We are defining two queues also in WebSphere. The most important one is the `REQ.BROWN` one as this is the one used to get message from. The `RESP.BROWN` is more for testing.
-
-![](docs/artifacts/image010.png)
-
-![](docs/artifacts/image011.png)
-
-#### Defining activation specification
-
-![](docs/artifacts/image012.png)
-
-![](docs/artifacts/image013.png)
-
-![](docs/artifacts/image014.png)
-
-#### Authentication Alias
-
-![](docs/artifacts/image015.png)
-
-### IBM Cloud deployment
+The event producer is still running on premise, so for tutorial purpose it runs as a Java program on your computer, but it is connected to a MQ manager running on IBM Cloud. The figure below illustrates the end state:
 
 ![](docs/SaaS-endState.png)
 
-#### Configuring MQ on IBM Cloud service
+So first we need to configure MQ on IBM Cloud:
 
-##### Create a MQ service
+### 2- Configuring MQ on IBM Cloud service
+
+#### Create a MQ service
 
 Once logged to the IBM Cloud console, using the `create new resource` button, select in the Catalog > Integration menu the `MQ` service:
 
@@ -144,7 +91,7 @@ Once the service is created it can be seen under the Services list of your dashb
 
 ![](docs/mq-service.png)
 
-##### Create a MQ Queue Manager
+#### Create a MQ Queue Manager
 
 When you opening the service you can create a queue manager by clicking on the `create` button:
 
@@ -238,13 +185,15 @@ Create a response queue.
 
 ![](docs/qmgr-login-MQ-Console-Create-Queue-RESP.BROWN.png)
 
-#### Configuring EAR on WebSphere
+### 3- Testing Remote MQ manager 
 
-Log into the WebSphere Admin Console.
+### 4- Configuring MDB resources on WebSphere Application Server
+
+We assume you have an existing WebSphere service up and running. Log into the WebSphere Admin Console.
 
 Navigate to: Resources->JMS->Queue connection factories
 
-##### Create Queue Connection Factory
+#### Create Queue Connection Factory
 
 Select the scope and click the "New" button.
 
@@ -280,7 +229,7 @@ Preview your selections and click the "Finish" button.
 
 Save your configuration changes.
 
-##### Create Request Queue
+#### Create Request Queue
 
 Navigate to: Resources->JMS->Queues
 
@@ -298,7 +247,7 @@ Fill in the Name, JNDI name and Queue name fields and click "OK".
 
 Save your configuration changes.
 
-##### Create Response Queue
+#### Create Response Queue
 
 Navigate to: Resources->JMS->Queues
 
@@ -322,7 +271,7 @@ Here are the two queues you just created.
 
 ![](docs/212-ResponseQ.png)
 
-##### Create Activation Specification
+#### Create Activation Specification
 
 Navigate to: Resources->JMS->Activation specifications
 
@@ -366,7 +315,7 @@ Save your configuration changes.
 
 ![](docs/327-ActivationSpec.png)
 
-##### Create JAAS Authentication Alias
+#### Create JAAS Authentication Alias
 
 Go back to the main page for the Activation Specification which you just completed and click the "JAAS - J2C authentication data" link.
 
@@ -384,7 +333,7 @@ Save you configuration changes.
 
 ![](docs/406-AuthAlias.png)
 
-##### Create-Deploy-EAR
+#### Create-Deploy-EAR
 
 Navigate to: Applications->New Application
 
@@ -475,7 +424,7 @@ On this page, accept the warning and click the "Continue" button.
 
 ![](docs/630-Set-Auth-Alias-Connection-Factory.png)
 
-##### Final Configuration Steps
+#### Final Configuration Steps
 
 First, you need to add this JVM command line parameter:
 
@@ -522,10 +471,3 @@ BrownEAR is a JEE application that contains one MDB (message
 driven bean) EJB that reads a message from a request queue and then writes the
 same message (with “Hello” as a prefix) to a response queue.
 
-### EAR deployment
-
-When you deploy the EAR, make sure the activation specification parameters are correct and match your artifact names.
-
-![](docs/artifacts/image016.png)
-
-![](docs/artifacts/image017.png)
