@@ -12,13 +12,14 @@ The event producer is a Java application using the MQ APIs to connect to a queue
 ## Table of contents
 
 * [Getting started](#getting-started)
-* [Environments](#environments)
+* [MQ lift and shift scenario](#mq-lift-and-shift-scenario)
+* [Environments](#1--environments)
     * [MQ running locally with docker](docker/README.md)
     * [MQ on premise with vSphere](#on-premise-mq-server-(vSphere))
-    * [Configuring WebSphere Application Server to access MQ](#configuring-websphere-application-server-to-access-mq)
-* [MQ on IBM Cloud](#configuring-mq-on-ibm-cloud-service)
-* [Producer Code](#producer)
-* [Consumer Code as MDB](#consumer)
+    * [Configuring WebSphere Application Server to access MQ](#4--configuring-websphere-application-server-to-access-mq)
+* [MQ on IBM Cloud](#2--configuring-mq-on-ibm-cloud-service)
+* [Producer Code](producer/README.md)
+* [Consumer Code as MDB](mdb-consumer/README.md)
 
 ## Getting Started
 
@@ -35,18 +36,18 @@ An IBM MQ queue manager provides asynchronous intercommunication between the app
 
 ![](docs/mq-architecture.png)
 
+In th above figure we group the following concepts:
 * [Single Queue Manager](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.1.0/com.ibm.mq.pla.doc/q004710_.htm) Client applications can run locally to the MQ manager which manages MQ Objects like queues and channels. Applications can also access remotely the queue manager.  
 
 * [Clustering](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.1.0/com.ibm.mq.pla.doc/q004691_.htm) Applications can gain asynchronous communication with a service hosted on another queue manager on another system, and queue manager can provide access to another queue manager. Routes that connect different queue managers and their queues are defined using distributed queuing techniques. The queue managers within the architecture are connected using channels.
 
-### MQ lift and shift scenario
+## MQ lift and shift scenario
 
 As illustrated in the figure below, a inventory / item event producer is sending message about inventory update in a warehouse, to a MQ server configured with queues and channels. An MDB listens to message and calls a SOAP service to persist the inventory update. The approach of the lift and shift scenario is to take this MDB and MQ instance and use the IBM MQ Service on IBM Cloud and deploy a the MDB on a WebSphere application server on IBM Cloud. The steps  can be summarized as:
 
 * [Step 1- Run MQ solution locally](#1--environments) You can use docker or VM to run a MQ server locally on your computer or on a vSphere environment.
 * [Step 2- Configure MQ service on IBM Cloud](#2--configuring-mq-on-ibm-cloud-service)
-
-* [Step 3- Test with remote MQ]()
+* [Step 3- Test with remote MQ](producer/README.md#test-with-mq-on-ibm-cloud)
 * [Step 4- Deploy the MDB on WAS service](#configuring-mdb-resources-on-websphere-application-server)
 
 ## 1- Environments
@@ -185,7 +186,9 @@ Create a response queue.
 
 ![](docs/qmgr-login-MQ-Console-Create-Queue-RESP.BROWN.png)
 
-### 3- Testing Remote MQ manager 
+### 3- Testing Remote MQ manager
+
+Once the MQ on IBM Cloud queue manager is up and running and queues are defined you can use the Inventory producer to post message to the MQ queue and event test it with a consumer. The description of this code and how to run it is described in [this note](producer/README.md)
 
 ### 4- Configuring MDB resources on WebSphere Application Server
 
@@ -458,16 +461,3 @@ There isn't an option to update the MQ resource adapter inside WAS v8.5.5 so the
 
 WAS 9.0 includes a more up to date MQ resource adapter version against which you can then set a generic JVM argument 
 "-Dcom.ibm.mq.cfg.jmqi.useMQCSPauthentication=true" in order to ensure the full password is transmitted as detailed here https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.0.0/com.ibm.mq.sec.doc/q118680_.html (note that this applies to all MQ applications running in that appserver JVM)
-
-## Code
-
-### Producer
-
-The producer's goal is to create "new item" events and send them to the queue. This is to simulate a warehouse backend service with mechanical systems which can scan item when reaching a specific part of the warehouse. The event will be processed to persist data in an Inventory database.
-
-### Consumer
-
-BrownEAR is a JEE application that contains one MDB (message
-driven bean) EJB that reads a message from a request queue and then writes the
-same message (with “Hello” as a prefix) to a response queue.
-
