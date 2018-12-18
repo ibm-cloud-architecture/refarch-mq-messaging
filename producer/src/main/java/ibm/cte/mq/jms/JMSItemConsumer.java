@@ -30,10 +30,10 @@ public class JMSItemConsumer {
 		JMSItemConsumer jmsConsumer = new JMSItemConsumer();
 		if (args.length == 1) {
 			jmsConsumer.configure(args[0]);
-        } else {
+		} else {
 			jmsConsumer.configure("src/main/resources/config.properties");
 		}
-    	try {
+		try {
     		JMSContext context = jmsConsumer.buildContext();
     		System.out.println("########################################");
     		System.out.println(" Consumer for inventory message from MQ ");

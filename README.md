@@ -155,6 +155,8 @@ This screenshot shows you the application that you just created.
 
 ![](docs/qmgr-define-application-results.png)
 
+#### Getting connection information
+
 You will have to retrieve your connection information for your queue manager. Click on the queue manager.
 
 ![](docs/qmgr-define-admin-user-get-API-key-goto-QM-page.png)

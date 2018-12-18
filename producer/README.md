@@ -7,7 +7,7 @@ The producer's goal is to create "new item" messages and to send them to MQ queu
 
 The code is under the src/main/java with the package `ibm.cte.mq.jms`. As any JMS implementation the code needs to do the following:
 
-* Build a JMF Factory using one of the JMS providers available. MQ comes with a JMS provider.
+* Build a JMS Factory using one of the JMS providers available. MQ comes with a JMS provider.
 * Create a connection factory and define the connection parameters to connect to the MQ queue manager host.
 * Build a [JMS Context](https://docs.oracle.com/javaee/7/api/javax/jms/JMSContext.html) is a new JMS 2.0 API to manage connection and session. 
 * Define the JMS resource destination of the message: here we use the MQ Queue,
@@ -59,36 +59,46 @@ To get your own parameter be sure to get the API key to access the IBM Cloud MQ 
 ```json
 {"name":"MQ user key","mqUsername":"boyerje","description":"Automatically created api key for MQ usage","createdAt":1545085534459,"apiKey":"G..."}
 ```
-For the hostname and other connection attributes use the Connection information downloaded as JSON as described in [this section]().
+For the hostname and other connection attributes use the Connection information downloaded as JSON as described in [this section](https://github.com/ibm-cloud-architecture/refarch-mq-messaging#getting-connection-information).
 
 After running the producer code the MQ console shows the number of message in the queue has increased:
 
 ![](../docs/mq-req-brown-1.png)
 
 The traces after the producer execution looks like the following:
-> #####################################
- Produce item inventory message to MQ 
-Platform:ibmmq-on-cloud
-Queue Manager:BrownMqOCqmgr
-Queue Name:REQ.BROWN
-channel:CLOUD.APP.SVRCONN
-hostname:brownmqocqmgr-.....us-south.mqcloud.ibm.com
-port:31480
-userid:boyerje
-password:G....
-SUCCESS
+> #####################################  
+ Produce item inventory message to MQ   
+Platform:ibmmq-on-cloud  
+Queue Manager:BrownMqOCqmgr  
+Queue Name:REQ.BROWN  
+channel:CLOUD.APP.SVRCONN  
+hostname:brownmqocqmgr-.....us-south.mqcloud.ibm.com   
+port:31480  
+userid:boyerje  
+password:G....  
+SUCCESS  
 
-Now it is possible to run a JMS consumer using the script: `./runJmsRemoteMQConsumer.sh`.
+## JMS Consumer
 
-> ########################################
- Consumer for inventory message from MQ 
- Queue: REQ.BROWN
-########################################
+Now it is possible to run a JMS consumer using the script: `./runJmsRemoteMQConsumer.sh` to get the following results:
+
+> ########################################  
+ Consumer for inventory message from MQ   
+ Queue: REQ.BROWN   
+########################################   
   Waiting....  
 Received message:   
 {"itemId":12,"quantity":10,"site":"Manif01","supplierId":5,"cost":12.0}   
 Inventory:
 item= 12 for quantity= 10 @ Manif01 from 5
+
+The JMS code is the class [ibm.cte.mq.jms.JMSItemConsumer.java](https://github.com/ibm-cloud-architecture/refarch-mq-messaging/blob/master/producer/src/main/java/ibm/cte/mq/jms/JMSItemConsumer.java) and do the following classical JMS steps:
+* Build a JMS Factory using one of the JMS providers available. MQ comes with a JMS provider.
+* Create a connection factory and define the connection parameters to connect to the MQ queue manager host.
+* Build a [JMS Context](https://docs.oracle.com/javaee/7/api/javax/jms/JMSContext.html) is a new JMS 2.0 API to manage connection and session.
+* Create a JMS consumer
+* Loop on the receiving message: Listen to string payload as the message is in JSON as string.
+
 
 ## Troubleshouting
 
