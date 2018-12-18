@@ -206,3 +206,7 @@ Once the MQ on IBM Cloud queue manager is up and running and queues are defined 
 ### 4- Configuring MDB resources on WebSphere Application Server
 
 We assume you have an existing WebSphere service up and running. Log into the WebSphere Admin Console and follow the instructions in [this note](docs/mdb-twas/README.md).
+
+## Contributing
+
+As this implementation solution is part of the Event Driven architeture reference architecture, the [contribution policies](./CONTRIBUTING.md) apply the same way here.
