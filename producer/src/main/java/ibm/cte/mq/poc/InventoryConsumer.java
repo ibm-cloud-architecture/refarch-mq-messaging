@@ -15,8 +15,7 @@ public class InventoryConsumer implements Runnable {
 	
 	private MQConfiguration config = new MQConfiguration();
 	
-	public InventoryConsumer() {
-		
+	public InventoryConsumer() {	
 	}
 
 	@Override
@@ -59,14 +58,30 @@ public class InventoryConsumer implements Runnable {
 
 	public void configure(String configFileName) {
 	   this.getConfig().loadProperties(configFileName);
+	   System.out.println("Platform:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_PLATFORM));
+		System.out.println("Queue Manager:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_QUEUEMANAGER));
+		System.out.println("Queue Name:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_QUEUENAME));
+		System.out.println("channel:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_CHANNEL));
+		System.out.println("hostname:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_HOST));
+		System.out.println("port:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_PORT));
+		System.out.println("userid:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_USERID));
+		System.out.println("password:" + this.getConfig().getProperties().getProperty(MQConfiguration.MQ_PASSWORD));
+   
 	}
+
 
 	public static void main(String[] args) {
 
 		System.out.println("#######################################");
 		System.out.println(" Consumer item inventory message to MQ ");
 		InventoryConsumer consumer = new InventoryConsumer();
-		consumer.configure("src/main/resources/config.properties");
+		if (args.length == 1) {
+			consumer.configure(args[0]);
+        } else {
+            // load config.properties from class loader);
+			consumer.configure("src/main/resources/config.properties");
+        }
+	
         consumer.run();
 	}
 	

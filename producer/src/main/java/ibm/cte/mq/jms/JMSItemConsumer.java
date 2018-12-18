@@ -18,12 +18,21 @@ public class JMSItemConsumer {
 	MQConfiguration config = new MQConfiguration();;
 	
 	public JMSItemConsumer() {
-    	getConfig().loadProperties();
+    	
+	}
+	
+	public void configure(String configFileName) {
+		this.getConfig().loadProperties(configFileName);
 	}
 	
     public static void main(String[] args) {
     
-    	JMSItemConsumer jmsConsumer = new JMSItemConsumer();
+		JMSItemConsumer jmsConsumer = new JMSItemConsumer();
+		if (args.length == 1) {
+			jmsConsumer.configure(args[0]);
+        } else {
+			jmsConsumer.configure("src/main/resources/config.properties");
+		}
     	try {
     		JMSContext context = jmsConsumer.buildContext();
     		System.out.println("########################################");

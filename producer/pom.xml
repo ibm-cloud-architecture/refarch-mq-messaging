@@ -55,6 +55,15 @@
 								 <mainClass>ibm.cte.mq.poc.ProduceItemMessage</mainClass>
 						 </configuration>
 				 </execution>
+         <execution>
+						 <id>ItemConsumer</id>
+						 <goals>
+							 <goal>java</goal>
+						 </goals>
+						 <configuration>
+								 <mainClass>ibm.cte.mq.poc.InventoryConsumer</mainClass>
+						 </configuration>
+				 </execution>
 			</executions>
 		</plugin>
     </plugins>
