@@ -1,4 +1,4 @@
-import ibm.cte.mq.msg.Inventory;
+ import ibm.cte.mq.msg.Inventory;
 import ibm.cte.mq.poc.InventoryConsumer;
 import ibm.cte.mq.poc.ProduceItemMessage;
 
